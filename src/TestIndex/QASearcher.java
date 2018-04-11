@@ -50,7 +50,8 @@ public class QASearcher {
 	public int getCollectionSize() {
 		return this.lReader.numDocs();
 	}
-
+	
+	//overload functions. two kinds of search method
 	//search for keywords in specified field, with the number of top results 
 	public ScoreDoc[] search(String field, String keywords, int numHits , String queryType) {
 		
