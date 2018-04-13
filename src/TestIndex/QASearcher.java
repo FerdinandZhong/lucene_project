@@ -15,6 +15,7 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.BooleanClause;
@@ -50,8 +51,7 @@ public class QASearcher {
 	public int getCollectionSize() {
 		return this.lReader.numDocs();
 	}
-	
-	//overload functions. two kinds of search method
+
 	//search for keywords in specified field, with the number of top results 
 	public ScoreDoc[] search(String field, String keywords, int numHits , String queryType) {
 		
@@ -95,7 +95,7 @@ public class QASearcher {
 		QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
 		Query multifieldsQuery;
 		BooleanQuery.Builder multiFieldBuilder = new BooleanQuery.Builder();
-		try {
+		//try {
 			if (queryType == "B") {
 				//keywords can be string[]
 				//fields can also be string[]
@@ -117,20 +117,44 @@ public class QASearcher {
 				multifieldsQuery = multiFieldBuilder.build();
 			}
 			ScoreDoc[] hits = null;
-			// Create a TopScoreDocCollector
-			TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
-
-			// search index
-			lSearcher.search(multifieldsQuery, collector);
-
-			// collect results
-			hits = collector.topDocs().scoreDocs;
+			try {
+				//Create a TopScoreDocCollector 
+				TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
+				
+				//search index
+				lSearcher.search(multifieldsQuery, collector);
+				
+				//collect results
+				hits = collector.topDocs().scoreDocs;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
 			return hits;
-		} catch (Exception e) {
-			e.printStackTrace();
-			return null;
-		}
 	}
+	
+	//search for keywords in specified field, with the number of top results 
+		public ScoreDoc[] search(Double latitude, Double longitude,Double radius,  int numHits) {
+			
+			//the query has to be analyzed the same way as the documents being index 
+			//using the same Analyzer 
+			QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
+			Query query;
+			query = LatLonPoint.newDistanceQuery("location", latitude, longitude, radius);
+			ScoreDoc[] hits = null;
+			try {
+				//Create a TopScoreDocCollector 
+				TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
+				
+				//search index
+				lSearcher.search(query, collector);
+				
+				//collect results
+				hits = collector.topDocs().scoreDocs;
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return hits;
+		}
 
 	//present the search results
 	public void printResult(ScoreDoc[] hits) {

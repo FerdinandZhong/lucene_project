@@ -143,7 +143,8 @@ public class QAIndexer {
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
 		
 		//close the index writer.
-		writer.close();
+		//writer.close();
+		writer.commit();
 			
 	}
 	
@@ -203,7 +204,8 @@ public void indexUser(String fileName) throws Exception {
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
 		
 		//close the index writer.
-		writer.close();
+		//writer.close();
+		writer.commit();
 			
 	}
 
@@ -295,6 +297,7 @@ public void indexReview(String fileName) throws Exception {
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
 		
 		//close the index writer.
+		
 		writer.close();
 			
 	}
