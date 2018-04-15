@@ -6,19 +6,20 @@
 
 package TestIndex;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.search.ScoreDoc;
 
 public class LuceneTester {
-
+	
 	/** Define the paths for the data file and the lucene index */
-	public static final String BUSINESSDATA_FILE="C:\\Users\\Sruthi\\Documents\\MSA\\Trimester 3\\IR\\Project\\yelp_dataset\\yelp_dataset\\dataset\\business.json";
-	public static final String USERDATA_FILE="C:\\Users\\Sruthi\\Documents\\MSA\\Trimester 3\\IR\\Project\\yelp_dataset\\yelp_dataset\\dataset\\user.json";
-	public static final String REVIEWDATA_FILE="C:\\Users\\Sruthi\\Documents\\MSA\\Trimester 3\\IR\\Project\\yelp_dataset\\yelp_dataset\\dataset\\review.json";
-	public static final String TIPDATA_FILE="C:\\Users\\Sruthi\\Documents\\MSA\\Trimester 3\\IR\\Project\\yelp_dataset\\yelp_dataset\\dataset\\tip.json";
-	public static final String INDEX_PATH="C:\\Users\\Sruthi\\Documents\\MSA\\Trimester 3\\IR\\Project\\LuceneTest\\luceneYelpBusinessIndex";
+	public static final String BUSINESSDATA_FILE="./dataset/business.json";
+	public static final String USERDATA_FILE="./dataset/user.json";
+	public static final String REVIEWDATA_FILE="./dataset/review.json";
+	public static final String TIPDATA_FILE="./dataset/tip.json";
+	public static final String INDEX_PATH="./luceneYelpBusinessIndex";
 	
 	
 	public static void main (String[] arg) throws Exception{
@@ -26,7 +27,8 @@ public class LuceneTester {
 		boolean preformIndex=true;
 		
 		// To perform indexing. If there is no change to the data file, index only need to be created once 
-
+		String filePath = new File("").getAbsolutePath();
+		System.out.println(filePath);
 		if(preformIndex){
 			QAIndexer indexer = new QAIndexer(LuceneTester.INDEX_PATH);
 			indexer.indexBusiness(LuceneTester.BUSINESSDATA_FILE);
