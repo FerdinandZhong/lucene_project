@@ -59,7 +59,23 @@ public class QAIndexer {
 		doc.add(new TextField("city", city, Field.Store.YES));
 		return doc;
 	}*/
-	
+	public void indexAllfiles(String[] fileNames)throws Exception {
+		for(int i=0; i< fileNames.length; i++) {
+			switch (fileNames[i]) {
+				case "./dataset/business.json": this.indexBusiness(fileNames[i]);
+				break;
+				case "./dataset/user.json": this.indexUser(fileNames[i]);
+				break;
+				case "./dataset/review.json": this.indexReview(fileNames[i]);
+				break;
+				case "./dataset/tip.json": this.indexTip(fileNames[i]);
+				break;
+			}	
+		}
+		//close the index writer.
+		writer.close();
+
+	}
 
 	protected Document getBusinessDocument(String business_id, String name, String neighborhood, String address, String city, String state, String postalcode, Double latitude, Double longitude,
 			Double stars, Integer review_count, Integer is_open, JSONObject attributes, JSONArray categories) throws Exception {
@@ -72,12 +88,14 @@ public class QAIndexer {
 		doc.add(new TextField("state", state, Field.Store.YES));
 		doc.add(new TextField("postalcode", postalcode, Field.Store.YES));
 		doc.add(new LatLonPoint("location", latitude,longitude));
+		// all need to be stored as text field, because the query contents are all in string
+		doc.add(new TextField("stars", stars.toString(), Field.Store.YES));
+		// this one can be kept for range query
 		doc.add(new DoublePoint("stars", stars));
-		//doc.add(new StoredField("stars", stars));
 		//doc.add(new IntPoint("review_count", review_count, Field.Store.YES));
-		doc.add(new StoredField("review_count", review_count));
+		doc.add(new TextField("review_count", review_count.toString(), Field.Store.YES));
 		//doc.add(new IntPoint("is_open", is_open, Field.Store.YES));
-		doc.add(new StoredField("is_open", is_open));
+		doc.add(new TextField("is_open", is_open == 1 ? "open": "closed", Field.Store.YES));
 		//doc.add(new StoredField("attributes", attributes, Field.Store.YES));
 		//doc.add(new TextField("categories", categories, Field.Store.YES));
 		doc.add(new TextField("city", city, Field.Store.YES));
@@ -140,11 +158,7 @@ public class QAIndexer {
 		//close the file reader
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
-		System.out.println("Total number of documents indexed: " + writer.maxDoc());
-		
-		//close the index writer.
-		writer.close();
-			
+		System.out.println("Total number of documents indexed: " + writer.maxDoc());			
 	}
 	
 public void indexUser(String fileName) throws Exception {
@@ -201,9 +215,6 @@ public void indexUser(String fileName) throws Exception {
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
-		
-		//close the index writer.
-		writer.close();
 			
 	}
 
@@ -214,42 +225,43 @@ public void indexUser(String fileName) throws Exception {
 		Document doc = new Document();
 		doc.add(new TextField("user_id", user_id, Field.Store.YES));
 		doc.add(new TextField("name", name, Field.Store.YES));
-		//doc.add(new IntPoint("review_count", review_count, Field.Store.YES));
-		doc.add(new StoredField("review_count", review_count));
+		doc.add(new TextField("review_count", review_count.toString(), Field.Store.YES));
+//		doc.add(new StoredField("review_count", review_count));
 		doc.add(new TextField("yelping_since", yelping_since, Field.Store.YES));
-		//doc.add(new TextField("friends", friends, Field.Store.YES));
-		//doc.add(new IntPoint("useful", useful, Field.Store.YES));
-		doc.add(new StoredField("useful", useful));
-		//doc.add(new IntPoint("funny", funny, Field.Store.YES));
-		doc.add(new StoredField("funny", funny));
-		//doc.add(new IntPoint("cool", cool, Field.Store.YES));
-		doc.add(new StoredField("cool", cool));
-		//doc.add(new IntPoint("fans", fans, Field.Store.YES));
-		doc.add(new StoredField("fans", fans));
-		//doc.add(new TextField("elite", elite, Field.Store.YES));
-		doc.add(new DoublePoint("average_stars", average_stars));
-		//doc.add(new IntPoint("compliment_hot", compliment_hot, Field.Store.YES));
-		doc.add(new StoredField("compliment_hot", compliment_hot));
-		//doc.add(new IntPoint("compliment_more", compliment_more, Field.Store.YES));
-		doc.add(new StoredField("compliment_more", compliment_more));
-		//doc.add(new IntPoint("compliment_profile", compliment_profile, Field.Store.YES));
-		doc.add(new StoredField("compliment_profile", compliment_profile));
-		//doc.add(new IntPoint("compliment_cute", compliment_cute, Field.Store.YES));
-		doc.add(new StoredField("compliment_cute", compliment_cute));
-		//doc.add(new IntPoint("compliment_list", compliment_list, Field.Store.YES));
-		doc.add(new StoredField("compliment_list", compliment_list));
-		//doc.add(new IntPoint("compliment_note", compliment_note, Field.Store.YES));
-		doc.add(new StoredField("compliment_note", compliment_note));
-		//doc.add(new IntPoint("compliment_plain", compliment_plain, Field.Store.YES));
-		doc.add(new StoredField("compliment_plain", compliment_plain));
-		//doc.add(new IntPoint("compliment_cool", compliment_cool, Field.Store.YES));
-		doc.add(new StoredField("compliment_cool", compliment_cool));
-		//doc.add(new IntPoint("compliment_funny", compliment_funny, Field.Store.YES));
-		doc.add(new StoredField("compliment_funny", compliment_funny));
-		//doc.add(new IntPoint("compliment_writer", compliment_writer, Field.Store.YES));
-		doc.add(new StoredField("compliment_writer", compliment_writer));
-		//doc.add(new IntPoint("compliment_photos", compliment_photos, Field.Store.YES));
-		doc.add(new StoredField("compliment_photos", compliment_photos));
+		doc.add(new TextField("friends", friends.toString(), Field.Store.YES));
+		doc.add(new TextField("useful", useful.toString(), Field.Store.YES));
+//		doc.add(new StoredField("useful", useful));
+		doc.add(new TextField("funny", funny.toString(), Field.Store.YES));
+//		doc.add(new StoredField("funny", funny));
+		doc.add(new TextField("cool", cool.toString(), Field.Store.YES));
+//		doc.add(new StoredField("cool", cool));
+		doc.add(new TextField("fans", fans.toString(), Field.Store.YES));
+//		doc.add(new StoredField("fans", fans));
+		doc.add(new TextField("elite", elite.toString(), Field.Store.YES));
+		doc.add(new TextField("average_stars", average_stars.toString(), Field.Store.YES));
+//		doc.add(new DoublePoint("average_stars", average_stars));
+		doc.add(new TextField("compliment_hot", compliment_hot.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_hot", compliment_hot));
+		doc.add(new TextField("compliment_more", compliment_more.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_more", compliment_more));
+		doc.add(new TextField("compliment_profile", compliment_profile.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_profile", compliment_profile));
+		doc.add(new TextField("compliment_cute", compliment_cute.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_cute", compliment_cute));
+		doc.add(new TextField("compliment_list", compliment_list.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_list", compliment_list));
+		doc.add(new TextField("compliment_note", compliment_note.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_note", compliment_note));
+		doc.add(new TextField("compliment_plain", compliment_plain.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_plain", compliment_plain));
+		doc.add(new TextField("compliment_cool", compliment_cool.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_cool", compliment_cool));
+		doc.add(new TextField("compliment_funny", compliment_funny.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_funny", compliment_funny));
+		doc.add(new TextField("compliment_writer", compliment_writer.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_writer", compliment_writer));
+		doc.add(new TextField("compliment_photos", compliment_photos.toString(), Field.Store.YES));
+//		doc.add(new StoredField("compliment_photos", compliment_photos));
 		
 		return doc;
 	}
@@ -293,9 +305,6 @@ public void indexReview(String fileName) throws Exception {
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
-		
-		//close the index writer.
-		writer.close();
 			
 	}
 
@@ -306,15 +315,16 @@ public void indexReview(String fileName) throws Exception {
 		doc.add(new TextField("user_id", user_id, Field.Store.YES));
 		doc.add(new TextField("business_id", business_id, Field.Store.YES));
 		//doc.add(new IntPoint("stars", stars, Field.Store.YES));
-		doc.add(new StoredField("stars", stars));
+		doc.add(new DoublePoint("stars", stars));
+		doc.add(new TextField("stars", stars.toString(), Field.Store.YES));
 		doc.add(new TextField("date", date, Field.Store.YES));
 		doc.add(new TextField("text", text, Field.Store.YES));
-		//doc.add(new IntPoint("useful", useful, Field.Store.YES));
-		doc.add(new StoredField("useful", useful));
-		//doc.add(new IntPoint("funny", funny, Field.Store.YES));
-		doc.add(new StoredField("funny", funny));
-		//doc.add(new IntPoint("cool", cool, Field.Store.YES));
-		doc.add(new StoredField("cool", cool));
+		doc.add(new TextField("useful", useful.toString(), Field.Store.YES));
+//		doc.add(new StoredField("useful", useful));
+		doc.add(new TextField("funny", funny.toString(), Field.Store.YES));
+//		doc.add(new StoredField("funny", funny));
+		doc.add(new TextField("cool", cool.toString(), Field.Store.YES));
+//		doc.add(new StoredField("cool", cool));
 		
 		return doc;
 	}
@@ -354,9 +364,6 @@ public void indexTip(String fileName) throws Exception {
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
-		
-		//close the index writer.
-		writer.close();
 			
 	}
 
@@ -365,8 +372,8 @@ public void indexTip(String fileName) throws Exception {
 		Document doc = new Document();
 		doc.add(new TextField("text", text, Field.Store.YES));
 		doc.add(new TextField("date", date, Field.Store.YES));
-		//doc.add(new IntPoint("likes", likes, Field.Store.YES));
-		doc.add(new StoredField("likes", likes));
+		doc.add(new TextField("likes", likes.toString(), Field.Store.YES));
+//		doc.add(new StoredField("likes", likes));
 		doc.add(new TextField("business_id", business_id, Field.Store.YES));
 		doc.add(new TextField("user_id", user_id, Field.Store.YES));
 		

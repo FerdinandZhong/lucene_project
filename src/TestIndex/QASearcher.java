@@ -15,6 +15,7 @@ import javax.swing.text.html.HTMLDocument.Iterator;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
+import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.search.BooleanClause;
@@ -62,14 +63,13 @@ public class QASearcher {
 		if(queryType == "B")
 		{
 			 query = builder.createBooleanQuery(field, keywords);
-			 /*BooleanClause[] clause = new BooleanClause[]();
-			 BooleanQuery booleanQuery = new BooleanQuery(numHits, clause);*/
-			 //booleanQuery.add(query, BooleanClause.Occur.MUST);
-			 //QueryBuilder builder1 = new QueryBuilder(new Analyzer());
 		}
 		else
 		{
-			 query = builder.createPhraseQuery(field, keywords);
+//			 query = builder.createPhraseQuery(field, keywords);
+			// sample of range query
+			 query =  DoublePoint.newRangeQuery(field, Double.parseDouble(keywords), 5);
+			 System.out.println(query);
 		}
 		ScoreDoc[] hits = null;
 		try {
@@ -134,18 +134,23 @@ public class QASearcher {
 
 	//present the search results
 	public void printResult(ScoreDoc[] hits) {
-		int i = 1;
-		for (ScoreDoc hit : hits) {
-			System.out.println("\nResult " + i + "\tDocID: " + hit.doc + "\t Score: " + hit.score);
-			try {
-				System.out.println("Business Name: " + lReader.document(hit.doc).get("name"));
-				System.out.println("Business City: " + lReader.document(hit.doc).get("city"));
-			} catch (Exception e) {
-				e.printStackTrace();
+		if(hits.length == 0) {
+			System.out.println("No results");
+		}else {
+			int i = 1;
+			for (ScoreDoc hit : hits) {
+				System.out.println("\nResult " + i + "\tDocID: " + hit.doc + "\t Score: " + hit.score);
+				try {
+					System.out.println("Business Name: " + lReader.document(hit.doc).get("name"));
+					System.out.println("Business City: " + lReader.document(hit.doc).get("city"));
+					System.out.println("Business Star: " + lReader.document(hit.doc).get("stars"));
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+
+				i++;
+
 			}
-
-			i++;
-
 		}
 	}
 

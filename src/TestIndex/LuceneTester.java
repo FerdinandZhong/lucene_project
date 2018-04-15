@@ -19,7 +19,7 @@ public class LuceneTester {
 	public static final String USERDATA_FILE="./dataset/user.json";
 	public static final String REVIEWDATA_FILE="./dataset/review.json";
 	public static final String TIPDATA_FILE="./dataset/tip.json";
-	public static final String INDEX_PATH="./luceneYelpBusinessIndex";
+	public static final String INDEX_PATH="./luceneIndex";
 	
 	
 	public static void main (String[] arg) throws Exception{
@@ -31,26 +31,16 @@ public class LuceneTester {
 		System.out.println(filePath);
 		if(preformIndex){
 			QAIndexer indexer = new QAIndexer(LuceneTester.INDEX_PATH);
-			indexer.indexBusiness(LuceneTester.BUSINESSDATA_FILE);
-			//indexer.indexUser(LuceneTester.USERDATA_FILE);
-			//indexer.indexReview(LuceneTester.REVIEWDATA_FILE);
-			//indexer.indexTip(LuceneTester.TIPDATA_FILE);
+			String[] indexPaths = {BUSINESSDATA_FILE, USERDATA_FILE, REVIEWDATA_FILE, TIPDATA_FILE};
+			indexer.indexAllfiles(indexPaths);
 		}
 		
 		//search index
 		QASearcher searcher=new QASearcher(LuceneTester.INDEX_PATH);
-		
+		ScoreDoc[] hits = null;
 		//search for keywords in field "question", and request for the top 20 results
-		ScoreDoc[] hits=searcher.search("name", "Beauty OR Salon", 5 ,"B");
+		hits = searcher.search("stars", "4.5", 5 ,"R");
 		searcher.printResult(hits);
-		
-		//phrase query in name field
-		//hits=searcher.search("name", "Beauty Salon", 5 , "P");
-		//searcher.printResult(hits);
-		
-		//search for keywords in "answer" field
-		//hits=searcher.search("city", "Las Vegas", 5 , "B");
-		//searcher.printResult(hits);
 		
 		//current idea.
 		//later i will think about put all queries in a json file and read this json file to get all queries and search one by one.
