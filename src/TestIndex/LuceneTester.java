@@ -38,9 +38,6 @@ public class LuceneTester {
 		//search index
 		QASearcher searcher=new QASearcher(LuceneTester.INDEX_PATH);
 		ScoreDoc[] hits = null;
-		//search for keywords in field "question", and request for the top 20 results
-		hits = searcher.search("stars", "4.5", 5 ,"R");
-		searcher.printResult(hits);
 		
 		//current idea.
 		//later i will think about put all queries in a json file and read this json file to get all queries and search one by one.
@@ -54,12 +51,16 @@ public class LuceneTester {
 		//phrase query in name field
 		hits=searcher.search(queryArray, 5 , "P");
 		searcher.printResult(hits);
-				
-		//search for keywords in "answer" field
-		//hits=searcher.search(queryArray, 5 , "B");
-		//searcher.printResult(hits);
 		
+		// DPoints within 30 km from colombo city
+		System.out.println("Businesses within 3 kms of specified latitude-longitude ");
+		hits = searcher.locationSearch(35.0, -80.0, 3000.0, 5);
+		searcher.printResult(hits);
 		
+		// Range Search
+		System.out.println("Search for Businesses within a range of stars");
+		hits = searcher.starsRangeSearch("stars", 1.2, 1.6, 10);
+		searcher.printResult(hits);
 	}
 	
 }
