@@ -31,7 +31,7 @@ public class LuceneTester {
 		System.out.println(filePath);
 		if(preformIndex){
 			QAIndexer indexer = new QAIndexer(LuceneTester.INDEX_PATH);
-			String[] indexPaths = {BUSINESSDATA_FILE, USERDATA_FILE, REVIEWDATA_FILE, TIPDATA_FILE};
+			String[] indexPaths = {BUSINESSDATA_FILE};
 			indexer.indexAllfiles(indexPaths);
 		}
 		
@@ -42,8 +42,9 @@ public class LuceneTester {
 		//current idea.
 		//later i will think about put all queries in a json file and read this json file to get all queries and search one by one.
 		List<SearchQuery> queries = new ArrayList<SearchQuery>();
-		queries.add(new SearchQuery("neighborhood", "Starmount"));
-		queries.add(new SearchQuery("stars", "5.0"));
+		queries.add(new SearchQuery("neighborhood", "Starmount", 0));
+		queries.add(new SearchQuery("stars", "5.0", 0));
+		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1));
 		SearchQuery[] queryArray = queries.toArray(new SearchQuery[0]);
 		hits=searcher.search(queryArray, 5 ,"B");
 		searcher.printResult(hits);
@@ -52,9 +53,9 @@ public class LuceneTester {
 		hits=searcher.search(queryArray, 5 , "P");
 		searcher.printResult(hits);
 		
-		// DPoints within 30 km from colombo city
+		// DPoints within 300 km from colombo city
 		System.out.println("Businesses within 3 kms of specified latitude-longitude ");
-		hits = searcher.locationSearch(35.0, -80.0, 3000.0, 5);
+		hits = searcher.locationSearch(35.0, -80.0, 300000.0, 5);
 		searcher.printResult(hits);
 		
 		// Range Search

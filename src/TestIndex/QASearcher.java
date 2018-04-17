@@ -21,7 +21,6 @@ import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.QueryBuilder;
 
-
 public class QASearcher {
 
 	private IndexSearcher lSearcher;
@@ -53,7 +52,7 @@ public class QASearcher {
 		if (queryType == "B") {
 			query = builder.createBooleanQuery(field, keywords);
 		} else {
-			 query = builder.createPhraseQuery(field, keywords);			
+			query = builder.createPhraseQuery(field, keywords);
 		}
 		ScoreDoc[] hits = null;
 		try {
@@ -87,7 +86,17 @@ public class QASearcher {
 				// one word, and then for each field is a boolean query
 				// Then combine all fields queries using boolean query
 				for (SearchQuery textQuery : textQueries) {
-					Query query = builder.createBooleanQuery(textQuery.getField(), textQuery.getContents());
+					Query query = null;
+					switch (textQuery.getType()) {
+					case 0:
+						query = builder.createBooleanQuery(textQuery.getField(), textQuery.getContents());
+						break;
+					case 1:
+						query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
+								textQuery.getLongitude(), textQuery.getRadius());
+						break;
+					}
+
 					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
 				}
 				multifieldsQuery = multiFieldBuilder.build();
@@ -98,7 +107,17 @@ public class QASearcher {
 				// but combined with other field's phrase query using boolean
 				// query
 				for (SearchQuery textQuery : textQueries) {
-					Query query = builder.createPhraseQuery(textQuery.getField(), textQuery.getContents());
+					Query query = null;
+					switch (textQuery.getType()) {
+					case 0:
+						query = builder.createPhraseQuery(textQuery.getField(), textQuery.getContents());
+						break;
+					case 1:
+						query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
+								textQuery.getLongitude(), textQuery.getRadius());
+						break;
+					}
+
 					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
 				}
 				multifieldsQuery = multiFieldBuilder.build();
@@ -141,7 +160,7 @@ public class QASearcher {
 		}
 		return hits;
 	}
-	
+
 	public ScoreDoc[] starsRangeSearch(String field, Double start, Double end, int numHits) {
 		// the query has to be analyzed the same way as the documents being
 		// index
