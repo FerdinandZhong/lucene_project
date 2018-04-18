@@ -7,6 +7,8 @@ public class SearchQuery {
 	private Double latitude;
 	private Double longitude;
 	private Double radius;
+	private Double start;
+	private Double end;
 	
 	public SearchQuery(String field, String contents, int type) {
 		this.setField(field);
@@ -19,6 +21,13 @@ public class SearchQuery {
 		this.setLatitude(latitude);
 		this.setLongitude(longitude);
 		this.setRadius(radius);
+		this.type = type;
+	}
+	
+	public SearchQuery(String field, Double start, Double end, int type) {
+		this.setField(field);
+		this.setStart(start);
+		this.setEnd(end);
 		this.type = type;
 	}
 
@@ -68,6 +77,22 @@ public class SearchQuery {
 
 	public void setRadius(Double radius) {
 		this.radius = radius;
+	}
+
+	public Double getStart() {
+		return start;
+	}
+
+	public void setStart(Double start) {
+		this.start = start;
+	}
+
+	public Double getEnd() {
+		return end;
+	}
+
+	public void setEnd(Double end) {
+		this.end = end;
 	}
 }
 

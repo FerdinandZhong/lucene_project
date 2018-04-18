@@ -7,6 +7,7 @@
 package TestIndex;
 
 import java.nio.file.Paths;
+
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.LatLonPoint;
@@ -18,6 +19,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopScoreDocCollector;
+import org.apache.lucene.search.similarities.Similarity;
 import org.apache.lucene.store.FSDirectory;
 import org.apache.lucene.util.QueryBuilder;
 
@@ -70,64 +72,72 @@ public class QASearcher {
 		return hits;
 	}
 
-	public ScoreDoc[] search(SearchQuery[] textQueries, int numHits, String queryType) {
-
-		// the query has to be analyzed the same way as the documents being
-		// index
-		// using the same Analyzer
+	public Query createQuery(SearchQuery[] textQueries, String queryType) {
 		QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
 		Query multifieldsQuery;
 		BooleanQuery.Builder multiFieldBuilder = new BooleanQuery.Builder();
-		try {
-			if (queryType == "B") {
-				// keywords can be string[]
-				// fields can also be string[]
-				// i think for each field, the query keywords can be more than
-				// one word, and then for each field is a boolean query
-				// Then combine all fields queries using boolean query
-				for (SearchQuery textQuery : textQueries) {
-					Query query = null;
-					switch (textQuery.getType()) {
-					case 0:
-						query = builder.createBooleanQuery(textQuery.getField(), textQuery.getContents());
-						break;
-					case 1:
-						query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
-								textQuery.getLongitude(), textQuery.getRadius());
-						break;
-					}
-
-					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+		if (queryType == "B") {
+			// keywords can be string[]
+			// fields can also be string[]
+			// i think for each field, the query keywords can be more than
+			// one word, and then for each field is a boolean query
+			// Then combine all fields queries using boolean query
+			for (SearchQuery textQuery : textQueries) {
+				Query query = null;
+				switch (textQuery.getType()) {
+				case 0:
+					query = builder.createBooleanQuery(textQuery.getField(), textQuery.getContents());
+					break;
+				case 1:
+					query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
+							textQuery.getLongitude(), textQuery.getRadius());
+					break;
+				case 2: 
+					query = DoublePoint.newRangeQuery(textQuery.getField(), textQuery.getStart(), textQuery.getEnd());
+					break;
 				}
-				multifieldsQuery = multiFieldBuilder.build();
-			} else {
-				// if we want to search for multiple fields using phrase query,
-				// it will be like this,
-				// query for every field is a phrase query
-				// but combined with other field's phrase query using boolean
-				// query
-				for (SearchQuery textQuery : textQueries) {
-					Query query = null;
-					switch (textQuery.getType()) {
-					case 0:
-						query = builder.createPhraseQuery(textQuery.getField(), textQuery.getContents());
-						break;
-					case 1:
-						query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
-								textQuery.getLongitude(), textQuery.getRadius());
-						break;
-					}
 
-					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
-				}
-				multifieldsQuery = multiFieldBuilder.build();
+				multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
 			}
+			multifieldsQuery = multiFieldBuilder.build();
+		} else {
+			// if we want to search for multiple fields using phrase query,
+			// it will be like this,
+			// query for every field is a phrase query
+			// but combined with other field's phrase query using boolean
+			// query
+			for (SearchQuery textQuery : textQueries) {
+				Query query = null;
+				switch (textQuery.getType()) {
+				case 0:
+					query = builder.createPhraseQuery(textQuery.getField(), textQuery.getContents());
+					break;
+				case 1:
+					query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
+							textQuery.getLongitude(), textQuery.getRadius());
+					break;
+				case 2: 
+					query = DoublePoint.newRangeQuery(textQuery.getField(), textQuery.getStart(), textQuery.getEnd());
+					break;
+				}
+
+				multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+			}
+			multifieldsQuery = multiFieldBuilder.build();
+		}
+		return multifieldsQuery;
+	}
+
+	public ScoreDoc[] search(Query query, int numHits, Similarity similarity) {
+		try {
 			ScoreDoc[] hits = null;
 			// Create a TopScoreDocCollector
 			TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
-
+			
+			//set different similarity for different retrieval model
+			lSearcher.setSimilarity(similarity);
 			// search index
-			lSearcher.search(multifieldsQuery, collector);
+			lSearcher.search(query, collector);
 
 			// collect results
 			hits = collector.topDocs().scoreDocs;
@@ -138,49 +148,11 @@ public class QASearcher {
 		}
 	}
 
-	// search for keywords in specified field, with the number of top results
-	public ScoreDoc[] locationSearch(Double latitude, Double longitude, Double radius, int numHits) {
-		// the query has to be analyzed the same way as the documents being
-		// index
-		// using the same Analyzer
-		Query query;
-		query = LatLonPoint.newDistanceQuery("location", latitude, longitude, radius);
-		ScoreDoc[] hits = null;
-		try {
-			// Create a TopScoreDocCollector
-			TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
-
-			// search index
-			lSearcher.search(query, collector);
-
-			// collect results
-			hits = collector.topDocs().scoreDocs;
-		} catch (Exception e) {
-			e.printStackTrace();
+	public void explain(Query query, ScoreDoc[] hits) throws Exception {
+		for(ScoreDoc hit : hits)
+		{
+			System.out.println(lSearcher.explain(query, hit.doc));
 		}
-		return hits;
-	}
-
-	public ScoreDoc[] starsRangeSearch(String field, Double start, Double end, int numHits) {
-		// the query has to be analyzed the same way as the documents being
-		// index
-		// using the same Analyzer
-		Query query;
-		query = DoublePoint.newRangeQuery(field, start, end);
-		ScoreDoc[] hits = null;
-		try {
-			// Create a TopScoreDocCollector
-			TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
-
-			// search index
-			lSearcher.search(query, collector);
-
-			// collect results
-			hits = collector.topDocs().scoreDocs;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return hits;
 	}
 
 	// present the search results
