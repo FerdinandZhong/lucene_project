@@ -46,9 +46,9 @@ public class LuceneTester {
 		//current idea.
 		//later i will think about put all queries in a json file and read this json file to get all queries and search one by one.
 		List<SearchQuery> queries = new ArrayList<SearchQuery>();
-		queries.add(new SearchQuery("neighborhood", "Starmount", 0)); 
-		queries.add(new SearchQuery("stars", 3.2, 4.6, 2));
-		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1));
+		queries.add(new SearchQuery("address", "University City",0, "AND")); 
+		queries.add(new SearchQuery("stars", 3.2, 4.6, 2, "OR"));
+		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1, "AND"));
 		SearchQuery[] queryArray = queries.toArray(new SearchQuery[0]);
 		Query query = searcher.createQuery(queryArray, "B");
 		//retrieval model 1

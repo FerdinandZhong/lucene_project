@@ -9,26 +9,30 @@ public class SearchQuery {
 	private Double radius;
 	private Double start;
 	private Double end;
+	private String operator;
 	
-	public SearchQuery(String field, String contents, int type) {
+	public SearchQuery(String field, String contents, int type, String operator) {
 		this.setField(field);
 		this.setContents(contents);
 		this.type = type;
+		this.setOperator(operator);
 	}
 	
-	public SearchQuery(String field, Double latitude, Double longitude, Double radius, int type) {
+	public SearchQuery(String field, Double latitude, Double longitude, Double radius, int type, String operator) {
 		this.setField(field);
 		this.setLatitude(latitude);
 		this.setLongitude(longitude);
 		this.setRadius(radius);
 		this.type = type;
+		this.setOperator(operator);
 	}
 	
-	public SearchQuery(String field, Double start, Double end, int type) {
+	public SearchQuery(String field, Double start, Double end, int type, String operator) {
 		this.setField(field);
 		this.setStart(start);
 		this.setEnd(end);
 		this.type = type;
+		this.setOperator(operator);
 	}
 
 	public String getField() {
@@ -93,6 +97,14 @@ public class SearchQuery {
 
 	public void setEnd(Double end) {
 		this.end = end;
+	}
+
+	public String getOperator() {
+		return operator;
+	}
+
+	public void setOperator(String operator) {
+		this.operator = operator;
 	}
 }
 

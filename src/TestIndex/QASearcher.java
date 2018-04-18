@@ -97,7 +97,12 @@ public class QASearcher {
 					break;
 				}
 
-				multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+				if(textQuery.getOperator() == "AND")
+					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+				else if(textQuery.getOperator() == "OR")
+					multiFieldBuilder.add(query, BooleanClause.Occur.SHOULD);
+				else if(textQuery.getOperator() == "NOT")
+					multiFieldBuilder.add(query, BooleanClause.Occur.MUST_NOT);
 			}
 			multifieldsQuery = multiFieldBuilder.build();
 		} else {
@@ -121,7 +126,12 @@ public class QASearcher {
 					break;
 				}
 
-				multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+				if(textQuery.getOperator() == "AND")
+					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+				else if(textQuery.getOperator() == "OR")
+					multiFieldBuilder.add(query, BooleanClause.Occur.SHOULD);
+				else if(textQuery.getOperator() == "NOT")
+					multiFieldBuilder.add(query, BooleanClause.Occur.MUST_NOT);
 			}
 			multifieldsQuery = multiFieldBuilder.build();
 		}
