@@ -72,69 +72,39 @@ public class QASearcher {
 		return hits;
 	}
 
-	public Query createQuery(SearchQuery[] textQueries, String queryType) {
+	public Query createQuery(SearchQuery[] textQueries) {
 		QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
 		Query multifieldsQuery;
 		BooleanQuery.Builder multiFieldBuilder = new BooleanQuery.Builder();
-		if (queryType == "B") {
-			// keywords can be string[]
-			// fields can also be string[]
-			// i think for each field, the query keywords can be more than
-			// one word, and then for each field is a boolean query
-			// Then combine all fields queries using boolean query
-			for (SearchQuery textQuery : textQueries) {
-				Query query = null;
-				switch (textQuery.getType()) {
-				case 0:
-					query = builder.createBooleanQuery(textQuery.getField(), textQuery.getContents());
-					break;
-				case 1:
-					query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
-							textQuery.getLongitude(), textQuery.getRadius());
-					break;
-				case 2: 
-					query = DoublePoint.newRangeQuery(textQuery.getField(), textQuery.getStart(), textQuery.getEnd());
-					break;
-				}
-
-				if(textQuery.getOperator() == "AND")
-					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
-				else if(textQuery.getOperator() == "OR")
-					multiFieldBuilder.add(query, BooleanClause.Occur.SHOULD);
-				else if(textQuery.getOperator() == "NOT")
-					multiFieldBuilder.add(query, BooleanClause.Occur.MUST_NOT);
+		// keywords can be string[]
+		// fields can also be string[]
+		// i think for each field, the query keywords can be more than
+		// one word, and then for each field is a boolean query
+		// Then combine all fields queries using boolean query
+		for (SearchQuery textQuery : textQueries) {
+			Query query = null;
+			switch (textQuery.getType()) {
+			case 0:
+				query = builder.createBooleanQuery(textQuery.getField(), textQuery.getContents());
+				break;
+			case 1:
+				query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
+						textQuery.getLongitude(), textQuery.getRadius());
+				break;
+			case 2:
+				query = DoublePoint.newRangeQuery(textQuery.getField(), textQuery.getStart(), textQuery.getEnd());
+				break;
 			}
-			multifieldsQuery = multiFieldBuilder.build();
-		} else {
-			// if we want to search for multiple fields using phrase query,
-			// it will be like this,
-			// query for every field is a phrase query
-			// but combined with other field's phrase query using boolean
-			// query
-			for (SearchQuery textQuery : textQueries) {
-				Query query = null;
-				switch (textQuery.getType()) {
-				case 0:
-					query = builder.createPhraseQuery(textQuery.getField(), textQuery.getContents());
-					break;
-				case 1:
-					query = LatLonPoint.newDistanceQuery(textQuery.getField(), textQuery.getLatitude(),
-							textQuery.getLongitude(), textQuery.getRadius());
-					break;
-				case 2: 
-					query = DoublePoint.newRangeQuery(textQuery.getField(), textQuery.getStart(), textQuery.getEnd());
-					break;
-				}
 
-				if(textQuery.getOperator() == "AND")
-					multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
-				else if(textQuery.getOperator() == "OR")
-					multiFieldBuilder.add(query, BooleanClause.Occur.SHOULD);
-				else if(textQuery.getOperator() == "NOT")
-					multiFieldBuilder.add(query, BooleanClause.Occur.MUST_NOT);
-			}
-			multifieldsQuery = multiFieldBuilder.build();
+			if (textQuery.getOperator() == "AND")
+				multiFieldBuilder.add(query, BooleanClause.Occur.MUST);
+			else if (textQuery.getOperator() == "OR")
+				multiFieldBuilder.add(query, BooleanClause.Occur.SHOULD);
+			else if (textQuery.getOperator() == "NOT")
+				multiFieldBuilder.add(query, BooleanClause.Occur.MUST_NOT);
 		}
+		multifieldsQuery = multiFieldBuilder.build();
+
 		return multifieldsQuery;
 	}
 
@@ -143,8 +113,8 @@ public class QASearcher {
 			ScoreDoc[] hits = null;
 			// Create a TopScoreDocCollector
 			TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
-			
-			//set different similarity for different retrieval model
+
+			// set different similarity for different retrieval model
 			lSearcher.setSimilarity(similarity);
 			// search index
 			lSearcher.search(query, collector);
@@ -159,8 +129,7 @@ public class QASearcher {
 	}
 
 	public void explain(Query query, ScoreDoc[] hits) throws Exception {
-		for(ScoreDoc hit : hits)
-		{
+		for (ScoreDoc hit : hits) {
 			System.out.println(lSearcher.explain(query, hit.doc));
 		}
 	}

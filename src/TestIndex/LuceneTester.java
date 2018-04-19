@@ -50,7 +50,7 @@ public class LuceneTester {
 		queries.add(new SearchQuery("stars", 3.2, 4.6, 2, "OR"));
 		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1, "AND"));
 		SearchQuery[] queryArray = queries.toArray(new SearchQuery[0]);
-		Query query = searcher.createQuery(queryArray, "B");
+		Query query = searcher.createQuery(queryArray);
 		//retrieval model 1
 		System.out.println("Retrieval Model: BM25Similarity");
 		hits=searcher.search(query, 5, new BM25Similarity());
