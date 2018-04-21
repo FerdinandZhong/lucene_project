@@ -1,6 +1,5 @@
 package TestIndex;
 
-import org.apache.lucene.index.FieldInvertState;
 import org.apache.lucene.search.similarities.TFIDFSimilarity;
 import org.apache.lucene.util.BytesRef;
 
@@ -22,7 +21,11 @@ public class ClassicSimilarity extends TFIDFSimilarity {
 	@Override
 	public float idf(long docFreq, long docCount) {
 		// TODO Auto-generated method stub
-		return (float) Math.log(docCount / docFreq);
+		if(docCount == 0) {
+			return 0;
+		} else {
+			return(float) Math.log(docCount / docFreq);
+		}
 	}
 
 	@Override

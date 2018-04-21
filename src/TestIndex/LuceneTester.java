@@ -27,7 +27,8 @@ public class LuceneTester {
 	
 	
 	public static void main (String[] arg) throws Exception{
-	
+		
+		//only the first time need to be true
 		boolean preformIndex=true;
 		
 		// To perform indexing. If there is no change to the data file, index only need to be created once 
@@ -48,7 +49,7 @@ public class LuceneTester {
 		List<SearchQuery> queries = new ArrayList<SearchQuery>();
 		queries.add(new SearchQuery("address", "University City",0, "AND")); 
 		queries.add(new SearchQuery("stars", 3.2, 4.6, 2, "OR"));
-		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1, "AND"));
+//		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1, "AND"));
 		SearchQuery[] queryArray = queries.toArray(new SearchQuery[0]);
 		Query query = searcher.createQuery(queryArray);
 		//retrieval model 1

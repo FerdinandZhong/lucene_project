@@ -1,5 +1,4 @@
 /**
- * @author axsun
  * This code is provided solely as sample code for using Lucene.
  * 
  */
@@ -146,6 +145,7 @@ public class QASearcher {
 					System.out.println("Business Name: " + lReader.document(hit.doc).get("name"));
 					System.out.println("Business City: " + lReader.document(hit.doc).get("city"));
 					System.out.println("Business Star: " + lReader.document(hit.doc).get("stars"));
+					System.out.println("Business Location: " + lReader.document(hit.doc).get("latitude") + ", " + lReader.document(hit.doc).get("longitude"));
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
