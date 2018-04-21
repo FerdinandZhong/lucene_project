@@ -31,9 +31,6 @@ public class LuceneTester {
 		//only the first time need to be true
 		boolean preformIndex=true;
 		
-		// To perform indexing. If there is no change to the data file, index only need to be created once 
-		String filePath = new File("").getAbsolutePath();
-		System.out.println(filePath);
 		if(preformIndex){
 			QAIndexer indexer = new QAIndexer(LuceneTester.INDEX_PATH);
 			String[] indexPaths = {BUSINESSDATA_FILE, USERDATA_FILE, REVIEWDATA_FILE, TIPDATA_FILE};
