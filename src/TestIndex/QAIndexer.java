@@ -83,6 +83,7 @@ public class QAIndexer {
 		doc.add(new TextField("longitude", longitude.toString(), Field.Store.YES));
 		// this one can be kept for range query
 		doc.add(new DoublePoint("stars", stars));
+		doc.add(new TextField("Stars", stars.toString(), Field.Store.YES));
 		doc.add(new DoublePoint("review_count", review_count));
 		doc.add(new TextField("is_open", is_open == 1 ? "open": "closed", Field.Store.YES));
 		doc.add(new TextField("city", city, Field.Store.YES));
@@ -197,7 +198,8 @@ public void indexUser(String fileName) throws Exception {
 		Document doc = new Document();
 		doc.add(new TextField("user_id", user_id, Field.Store.YES));
 		doc.add(new TextField("user_name", name, Field.Store.YES));
-		doc.add(new TextField("review_count", review_count.toString(), Field.Store.YES));
+		doc.add(new DoublePoint("review_count", review_count));
+		doc.add(new TextField("Review_count", review_count.toString(), Field.Store.YES));
 		doc.add(new TextField("yelping_since", yelping_since, Field.Store.YES));
 		doc.add(new TextField("friends", friends.toString(), Field.Store.YES));
 		doc.add(new TextField("useful", useful.toString(), Field.Store.YES));
@@ -206,6 +208,7 @@ public void indexUser(String fileName) throws Exception {
 		doc.add(new DoublePoint("fans", fans));
 		doc.add(new TextField("elite", elite.toString(), Field.Store.YES));
 		doc.add(new DoublePoint("average_stars", average_stars));
+		doc.add(new TextField("Average_stars", average_stars.toString(), Field.Store.YES));
 		return doc;
 	}
 	

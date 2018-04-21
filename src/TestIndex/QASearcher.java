@@ -5,6 +5,7 @@
 
 package TestIndex;
 
+import java.io.IOException;
 import java.nio.file.Paths;
 
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -40,35 +41,6 @@ public class QASearcher {
 	// report the number of documents indexed
 	public int getCollectionSize() {
 		return this.lReader.numDocs();
-	}
-
-	// overload functions. two kinds of search method
-	// search for keywords in specified field, with the number of top results
-	public ScoreDoc[] search(String field, String keywords, int numHits, String queryType) {
-		// the query has to be analyzed the same way as the documents being
-		// index
-		// using the same Analyzer
-		QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
-		Query query;
-		if (queryType == "B") {
-			query = builder.createBooleanQuery(field, keywords);
-		} else {
-			query = builder.createPhraseQuery(field, keywords);
-		}
-		ScoreDoc[] hits = null;
-		try {
-			// Create a TopScoreDocCollector
-			TopScoreDocCollector collector = TopScoreDocCollector.create(numHits);
-
-			// search index
-			lSearcher.search(query, collector);
-
-			// collect results
-			hits = collector.topDocs().scoreDocs;
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return hits;
 	}
 
 	public Query createQuery(SearchQuery[] textQueries) {
@@ -127,10 +99,41 @@ public class QASearcher {
 		}
 	}
 
+	public ScoreDoc getDetails(String id, String field) {
+		try {
+			ScoreDoc[] hits = null;
+			// Create a TopScoreDocCollector
+			TopScoreDocCollector collector = TopScoreDocCollector.create(1);
+			QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
+			Query query = builder.createBooleanQuery(field, id);
+			// search index
+			lSearcher.search(query, collector);
+
+			// collect results
+			hits = collector.topDocs().scoreDocs;
+			return hits[0];
+		} catch (Exception e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
 	public void explain(Query query, ScoreDoc[] hits) throws Exception {
 		for (ScoreDoc hit : hits) {
 			System.out.println(lSearcher.explain(query, hit.doc));
 		}
+	}
+	
+	public void businessPrint(ScoreDoc hit) throws IOException {
+		System.out.println("Business Name: " + lReader.document(hit.doc).get("name"));
+		System.out.println("Business City: " + lReader.document(hit.doc).get("city"));
+		System.out.println("Business Star: " + lReader.document(hit.doc).get("Stars"));
+		System.out.println("Business Location: " + lReader.document(hit.doc).get("latitude") + ", " + lReader.document(hit.doc).get("longitude"));
+	}
+	
+	public void userPrint(ScoreDoc hit) throws IOException {
+		System.out.println("User Name: " + lReader.document(hit.doc).get("user_name"));
+		System.out.println("User Review Count: " + lReader.document(hit.doc).get("Review_count"));
+		System.out.println("User Average Stars: " + lReader.document(hit.doc).get("Average_stars"));
 	}
 
 	// present the search results
@@ -142,10 +145,20 @@ public class QASearcher {
 			for (ScoreDoc hit : hits) {
 				System.out.println("\nResult " + i + "\tDocID: " + hit.doc + "\t Score: " + hit.score);
 				try {
-					System.out.println("Business Name: " + lReader.document(hit.doc).get("name"));
-					System.out.println("Business City: " + lReader.document(hit.doc).get("city"));
-					System.out.println("Business Star: " + lReader.document(hit.doc).get("stars"));
-					System.out.println("Business Location: " + lReader.document(hit.doc).get("latitude") + ", " + lReader.document(hit.doc).get("longitude"));
+					if(lReader.document(hit.doc).get("business_id")!= null && lReader.document(hit.doc).get("user_id")!= null) {
+						ScoreDoc business_hit = getDetails(lReader.document(hit.doc).get("business_id"), "business_id");
+						businessPrint(business_hit);
+						ScoreDoc user_hit = getDetails(lReader.document(hit.doc).get("user_id"), "user_id");
+						userPrint(user_hit);
+					} else {
+						if(lReader.document(hit.doc).get("business_id")!= null ) {
+							businessPrint(hit);
+						} 
+						if (lReader.document(hit.doc).get("user_id")!= null) {
+							userPrint(hit);
+						}
+					}
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

@@ -47,9 +47,12 @@ public class LuceneTester {
 		//current idea.
 		//later i will think about put all queries in a json file and read this json file to get all queries and search one by one.
 		List<SearchQuery> queries = new ArrayList<SearchQuery>();
+		//test for tip
+//		queries.add(new SearchQuery("text", "Tuesday spaghetti special  all day $5.59 includes soup or salad and bread", 0,"AND"));
 		queries.add(new SearchQuery("address", "University City",0, "AND")); 
 		queries.add(new SearchQuery("stars", 3.2, 4.6, 2, "OR"));
-//		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1, "AND"));
+		queries.add(new SearchQuery("location", 35.0, -80.0, 300000.0, 1, "AND"));
+		queries.add(new SearchQuery("review_count", 10.0, 15.0, 2, "OR"));
 		SearchQuery[] queryArray = queries.toArray(new SearchQuery[0]);
 		Query query = searcher.createQuery(queryArray);
 		//retrieval model 1
