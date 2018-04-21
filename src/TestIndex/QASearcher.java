@@ -47,11 +47,6 @@ public class QASearcher {
 		QueryBuilder builder = new QueryBuilder(new StandardAnalyzer());
 		Query multifieldsQuery;
 		BooleanQuery.Builder multiFieldBuilder = new BooleanQuery.Builder();
-		// keywords can be string[]
-		// fields can also be string[]
-		// i think for each field, the query keywords can be more than
-		// one word, and then for each field is a boolean query
-		// Then combine all fields queries using boolean query
 		for (SearchQuery textQuery : textQueries) {
 			Query query = null;
 			switch (textQuery.getType()) {
@@ -145,6 +140,7 @@ public class QASearcher {
 			for (ScoreDoc hit : hits) {
 				System.out.println("\nResult " + i + "\tDocID: " + hit.doc + "\t Score: " + hit.score);
 				try {
+					// when result is review or tip, go to find business and user
 					if(lReader.document(hit.doc).get("business_id")!= null && lReader.document(hit.doc).get("user_id")!= null) {
 						ScoreDoc business_hit = getDetails(lReader.document(hit.doc).get("business_id"), "business_id");
 						businessPrint(business_hit);

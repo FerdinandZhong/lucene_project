@@ -1,5 +1,5 @@
 /**
- * @author axsun
+ *
  * This code is provided solely as sample code for using Lucene.
  * 
  */
@@ -44,8 +44,6 @@ public class LuceneTester {
 		QASearcher searcher=new QASearcher(LuceneTester.INDEX_PATH);
 		ScoreDoc[] hits = null;
 		
-		//current idea.
-		//later i will think about put all queries in a json file and read this json file to get all queries and search one by one.
 		List<SearchQuery> queries = new ArrayList<SearchQuery>();
 		//test for tip
 //		queries.add(new SearchQuery("text", "Tuesday spaghetti special  all day $5.59 includes soup or salad and bread", 0,"AND"));

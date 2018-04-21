@@ -1,5 +1,5 @@
 /**
- * @author axsun
+ *
  * This code is provided solely as sample code for using Lucene.
  * 
  */
@@ -223,7 +223,6 @@ public void indexReview(String fileName) throws Exception {
 		while (in.hasNextLine()) {
 			try {
 				jLine = in.nextLine().trim();
-				//parse the JSON file and extract the values for "question" and "answer"
 				JSONObject jObj = new JSONObject(jLine);
 				String review_id = jObj.getString("review_id");
 				String user_id = jObj.getString("user_id");
@@ -281,7 +280,6 @@ public void indexTip(String fileName) throws Exception {
 		while (in.hasNextLine()) {
 			try {
 				jLine = in.nextLine().trim();
-				//parse the JSON file and extract the values for "question" and "answer"
 				JSONObject jObj = new JSONObject(jLine);
 				String text = jObj.getString("text");
 				String date = jObj.getString("date");
@@ -289,7 +287,6 @@ public void indexTip(String fileName) throws Exception {
 				String business_id = jObj.getString("business_id");
 				String user_id = jObj.getString("user_id");
 							
-				//create a document for each JSON record 
 				Document doc = getTipDocument(text, date, likes, business_id, user_id);
 				
 				//index the document
