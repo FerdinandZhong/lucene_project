@@ -49,7 +49,6 @@ public class QAIndexer {
 		writer = new IndexWriter(indexDir, cfg);
 	}
 
-	//specify what is a document, and how its fields are indexed
 	public void indexAllfiles(String[] fileNames)throws Exception {
 		for(int i=0; i< fileNames.length; i++) {
 			switch (fileNames[i]) {
@@ -81,16 +80,12 @@ public class QAIndexer {
 		doc.add(new LatLonPoint("location", latitude,longitude));
 		doc.add(new TextField("latitude", latitude.toString(), Field.Store.YES));
 		doc.add(new TextField("longitude", longitude.toString(), Field.Store.YES));
-		// this one can be kept for range query
 		doc.add(new DoublePoint("stars", stars));
 		doc.add(new TextField("Stars", stars.toString(), Field.Store.YES));
 		doc.add(new DoublePoint("review_count", review_count));
 		doc.add(new TextField("is_open", is_open == 1 ? "open": "closed", Field.Store.YES));
 		doc.add(new TextField("city", city, Field.Store.YES));
-		for(int i=0;i<categories.length();i++) {
-		    doc.add(new TextField("categories", categories.get(i).toString() , Field.Store.YES)); // doc is a Document 
-		}
-
+		doc.add(new TextField("categories", categories.toString().replace("[", "").replace("]", ""), Field.Store.YES)); 
 		return doc;
 	}
 	
@@ -98,14 +93,12 @@ public class QAIndexer {
 		
 		System.out.println("Start indexing "+fileName+" "+sdf.format(new Date()));
 		
-		//read a JSON file
 		Scanner in = new Scanner(new File(fileName));
 		int lineNumber = 1;
 		String jLine = "";
 		while (in.hasNextLine()) {
 			try {
 				jLine = in.nextLine().trim();
-				//parse the JSON file and extract the values for "question" and "answer"
 				JSONObject jObj = new JSONObject(jLine);
 				String business_id = jObj.getString("business_id");
 				String name = jObj.getString("name");
@@ -130,11 +123,9 @@ public class QAIndexer {
 				JSONObject attributes = jObj.getJSONObject("attributes");
 				JSONArray categories = jObj.getJSONArray("categories");
 
-				//create a document for each JSON record 
 				Document doc = getBusinessDocument(business_id, name, neighborhood, address, city, state, postalcode, latitude, longitude,
 						stars, review_count, is_open, attributes, categories);
 				
-				//index the document
 				writer.addDocument(doc);
 				
 				lineNumber++;
@@ -143,7 +134,6 @@ public class QAIndexer {
 				e.printStackTrace();
 			}
 		}
-		//close the file reader
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());			
@@ -153,14 +143,12 @@ public void indexUser(String fileName) throws Exception {
 		
 		System.out.println("Start indexing "+fileName+" "+sdf.format(new Date()));
 		
-		//read a JSON file
 		Scanner in = new Scanner(new File(fileName));
 		int lineNumber = 1;
 		String jLine = "";
 		while (in.hasNextLine()) {
 			try {
 				jLine = in.nextLine().trim();
-				//parse the JSON file and extract the values for "question" and "answer"
 				JSONObject jObj = new JSONObject(jLine);
 				String user_id = jObj.getString("user_id");
 				String name = jObj.getString("name");
@@ -174,11 +162,9 @@ public void indexUser(String fileName) throws Exception {
 				JSONArray elite = jObj.getJSONArray("elite");
 				Double average_stars = jObj.getDouble("average_stars");
 
-				//create a document for each JSON record 
 				Document doc = getUserDocument(user_id, name, review_count, yelping_since, friends, useful, funny, cool, fans,
 						elite, average_stars);
 				
-				//index the document
 				writer.addDocument(doc);
 				
 				lineNumber++;
@@ -187,7 +173,6 @@ public void indexUser(String fileName) throws Exception {
 				e.printStackTrace();
 			}
 		}
-		//close the file reader
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
@@ -203,12 +188,12 @@ public void indexUser(String fileName) throws Exception {
 		doc.add(new DoublePoint("review_count", review_count));
 		doc.add(new TextField("Review_count", review_count.toString(), Field.Store.YES));
 		doc.add(new TextField("yelping_since", yelping_since, Field.Store.YES));
-		doc.add(new TextField("friends", friends.toString(), Field.Store.YES));
+		doc.add(new TextField("friends", friends.toString().replace("[", "").replace("]", ""), Field.Store.YES));
 		doc.add(new TextField("useful", useful.toString(), Field.Store.YES));
 		doc.add(new TextField("funny", funny.toString(), Field.Store.YES));
 		doc.add(new TextField("cool", cool.toString(), Field.Store.YES));
 		doc.add(new DoublePoint("fans", fans));
-		doc.add(new TextField("elite", elite.toString(), Field.Store.YES));
+		doc.add(new TextField("elite", elite.toString().replace("[", "").replace("]", ""), Field.Store.YES));
 		doc.add(new DoublePoint("average_stars", average_stars));
 		doc.add(new TextField("Average_stars", average_stars.toString(), Field.Store.YES));
 		return doc;
@@ -218,7 +203,6 @@ public void indexReview(String fileName) throws Exception {
 		
 		System.out.println("Start indexing "+fileName+" "+sdf.format(new Date()));
 		
-		//read a JSON file
 		Scanner in = new Scanner(new File(fileName));
 		int lineNumber = 1;
 		String jLine = "";
@@ -236,10 +220,8 @@ public void indexReview(String fileName) throws Exception {
 				Integer funny = jObj.getInt("funny");
 				Integer cool = jObj.getInt("cool");
 							
-				//create a document for each JSON record 
 				Document doc = getReviewDocument(review_id, user_id, business_id, stars, date, text, useful, funny, cool);
 				
-				//index the document
 				writer.addDocument(doc);
 				
 				lineNumber++;
@@ -248,7 +230,6 @@ public void indexReview(String fileName) throws Exception {
 				e.printStackTrace();
 			}
 		}
-		//close the file reader
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());
@@ -275,7 +256,6 @@ public void indexTip(String fileName) throws Exception {
 		
 		System.out.println("Start indexing "+fileName+" "+sdf.format(new Date()));
 		
-		//read a JSON file
 		Scanner in = new Scanner(new File(fileName));
 		int lineNumber = 1;
 		String jLine = "";
@@ -291,7 +271,6 @@ public void indexTip(String fileName) throws Exception {
 							
 				Document doc = getTipDocument(text, date, likes, business_id, user_id);
 				
-				//index the document
 				writer.addDocument(doc);
 				
 				lineNumber++;
@@ -300,7 +279,6 @@ public void indexTip(String fileName) throws Exception {
 				e.printStackTrace();
 			}
 		}
-		//close the file reader
 		in.close();
 		System.out.println("Index completed at " + sdf.format(new Date()));
 		System.out.println("Total number of documents indexed: " + writer.maxDoc());

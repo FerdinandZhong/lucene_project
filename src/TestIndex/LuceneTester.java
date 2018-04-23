@@ -6,14 +6,12 @@
 
 package TestIndex;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.similarities.BM25Similarity;
-import org.apache.lucene.search.similarities.BooleanSimilarity;
 
 
 public class LuceneTester {
@@ -47,7 +45,7 @@ public class LuceneTester {
 		
 		List<SearchQuery> queries = new ArrayList<SearchQuery>();
 		/*----------create 20 queries, and retrieve top 10 results----------*/
-		//1: Restaurant named “Village Juicery”
+		//1: Restaurant named Village Juicery
 		queries.add(new SearchQuery("name", "Village Juicery", 0,"AND"));
 		//2: Business with stars from 4.5 to 4.8
 		//queries.add(new SearchQuery("stars", 4.5, 4.9, RANGE_QUERY_TYPE, "OR"));

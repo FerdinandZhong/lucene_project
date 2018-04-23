@@ -93,7 +93,8 @@ public class QASearcher {
 			return null;
 		}
 	}
-
+	
+	//get business or user details
 	public ScoreDoc getDetails(String id, String field) {
 		try {
 			ScoreDoc[] hits = null;
