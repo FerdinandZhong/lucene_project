@@ -87,8 +87,10 @@ public class QAIndexer {
 		doc.add(new DoublePoint("review_count", review_count));
 		doc.add(new TextField("is_open", is_open == 1 ? "open": "closed", Field.Store.YES));
 		doc.add(new TextField("city", city, Field.Store.YES));
-		
-		
+		for(int i=0;i<categories.length();i++) {
+		    doc.add(new TextField("categories", categories.get(i).toString() , Field.Store.YES)); // doc is a Document 
+		}
+
 		return doc;
 	}
 	
